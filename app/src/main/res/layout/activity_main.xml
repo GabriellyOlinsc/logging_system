@@ -16,6 +16,7 @@
         android:textAlignment="center"
         tools:ignore="MissingConstraints" />
 
+
     <TextView
         android:id="@+id/titulo"
         android:layout_width="wrap_content"
@@ -30,6 +31,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/horas"
@@ -125,7 +127,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/matriculaInput" />
 
-
     <Button
         android:id="@+id/btn_registrar_ponto"
         android:layout_width="200dp"
@@ -143,33 +144,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/cargoInput" />
 
-    <LinearLayout
-        android:id="@+id/campos_registros"
-        android:layout_width="389dp"
-        android:layout_height="156dp"
+    <ScrollView
+        android:layout_width="300dp"
+        android:layout_height="91dp"
         android:layout_marginTop="71dp"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.592"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btn_registrar_ponto"
-        app:layout_constraintVertical_bias="0.4">
+        app:layout_constraintVertical_bias="0.232">
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/campos_registros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+        </LinearLayout>
 
-    <!--    <ScrollView-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        tools:layout_editor_absoluteX="13dp"-->
-    <!--        tools:layout_editor_absoluteY="558dp">-->
-
-    <!--        <LinearLayout-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:orientation="vertical" />-->
-    <!--    </ScrollView>-->
-
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
