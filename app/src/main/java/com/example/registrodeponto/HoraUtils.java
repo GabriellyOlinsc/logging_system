@@ -21,7 +21,7 @@ public class HoraUtils {
 
                 textView.setText(horaFormatada);
 
-                RegistroUtils.atualizarCamposDisponiveis(hora, activity); // Corrigido o parâmetro para activity
+                RegistroUtils.atualizarCamposDisponiveis(hora); // Corrigido o parâmetro para activity
 
                 handler.postDelayed(this, 1000);
             }

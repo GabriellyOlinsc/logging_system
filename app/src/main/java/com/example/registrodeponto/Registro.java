@@ -9,11 +9,19 @@ public class Registro {
     private String cargo;
     private ArrayList<Integer> pontos = new ArrayList<>();
 
+
     public Registro(String nome, String matricula, String lotacao, String cargo) {
         this.nome = nome;
         this.matricula = matricula;
         this.lotacao = lotacao;
         this.cargo = cargo;
+    }
+
+    public ArrayList<Integer> getPontos() {
+        return pontos;
+    }
+    public void limparRegistros (){
+        pontos.clear();
     }
 
     public void adicionarRegistro(int horario){

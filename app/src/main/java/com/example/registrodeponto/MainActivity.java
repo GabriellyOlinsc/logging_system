@@ -1,53 +1,66 @@
 package com.example.registrodeponto;
+
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Locale;
+
 import android.os.Handler;
-import android.widget.Toast;
+import android.widget.TextView;
+
 
 public class MainActivity extends AppCompatActivity {
-    TextView tv_horas;
-    private EditText matricula, nome, lotacao, funcao;;
+    private static final int DELAY_ONE_MINUTE = 20000; // 1 minuto em milissegundos
+
+    private TextView tv_horas;
+    private EditText matricula, nome, lotacao, funcao;
     private Button btn;
     private static Registro historicoRegistro;
-    LocalTime horaAtual = LocalTime.now();
-    String horaFormatada = horaAtual.getMinute() < 10 ? horaAtual.getHour() + ":0" + horaAtual.getMinute() :
-            horaAtual.getHour() + ":" + horaAtual.getMinute();
-    int camposDisponiveis = RegistroUtils.atualizarCamposDisponiveis(horaAtual.getHour(), MainActivity.this);
+    private LinearLayout linearLayout;
+    private LocalTime horaAtual;
+    private String horaFormatada;
+    private int camposDisponiveis;
+
+    private final TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        @Override
+        public void afterTextChanged(Editable s) {
+            boolean camposPreenchidos = !matricula.getText().toString().isEmpty() &&
+                    !nome.getText().toString().isEmpty() &&
+                    !lotacao.getText().toString().isEmpty() &&
+                    !funcao.getText().toString().isEmpty();
+
+            btn.setEnabled(camposPreenchidos);
+        }
+    };
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LinearLayout linearLayout = findViewById(R.id.campos_registros);
-        linearLayout.removeAllViews();
-
+        linearLayout = findViewById(R.id.campos_registros);
         btn = findViewById(R.id.btn_registrar_ponto);
-        btn.setEnabled(false);
-
         matricula = findViewById(R.id.matriculaInput);
         nome = findViewById(R.id.nomeInput);
-        lotacao = findViewById(R.id.lotacaoInput); // pega a lotação
-        funcao = findViewById(R.id.cargoInput); // pega a função
+        lotacao = findViewById(R.id.lotacaoInput);
+        funcao = findViewById(R.id.cargoInput);
+
+        // Desabilita o botão até que todos os campos estejam preenchidos
+        btn.setEnabled(false);
 
         matricula.addTextChangedListener(textWatcher);
         nome.addTextChangedListener(textWatcher);
@@ -57,49 +70,77 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(historicoRegistro == null){  //verificando se o registro do usuário já foi instaciado
-                    System.out.print("Objeto sendo instanciado");
-                    historicoRegistro = new Registro(nome.getText().toString(),matricula.getText().toString(),lotacao.getText().toString(),funcao.getText().toString());
+                if(historicoRegistro == null){
+                    historicoRegistro = new Registro(nome.getText().toString(),
+                            matricula.getText().toString(),
+                            lotacao.getText().toString(),
+                            funcao.getText().toString());
+                    Log.d("TAG","ja foi criado");
                 }
-                RegistroUtils.registrarPonto(MainActivity.this, linearLayout, historicoRegistro, horaFormatada, horaAtual.getHour(), camposDisponiveis);
+
+
+                RegistroUtils.registrarPonto(MainActivity.this,
+                        linearLayout,
+                        historicoRegistro,
+                        horaFormatada,
+                        LocalTime.now().getHour(),
+                        camposDisponiveis);
             }
         });
 
+        // Inicializa a hora atual e os campos disponíveis
+        horaAtual = LocalTime.now();
+        horaFormatada = String.format(Locale.getDefault(), "%02d:%02d", horaAtual.getHour(), horaAtual.getMinute());
+        camposDisponiveis = RegistroUtils.atualizarCamposDisponiveis(horaAtual.getHour());
 
+        // Atualiza o texto da hora na TextView
         tv_horas = findViewById(R.id.horas);
         HoraUtils.atualizarHora(tv_horas, this);
 
+        // Configura o Handler para limpar o LinearLayout se for entre meia-noite e 9h
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                LocalTime horaAtual = LocalTime.now();
-                if (horaAtual.getHour() > 16 && horaAtual.getHour() < 9) {
+                horaAtual = LocalTime.now();
+                if (horaAtual.getHour() > 23 || horaAtual.getHour() < 9) {
+                    historicoRegistro.limparRegistros();
                     linearLayout.removeAllViews();
                 }
-                handler.postDelayed(this, 60000); // Verifica a cada minuto
+                handler.postDelayed(this, DELAY_ONE_MINUTE); // Verifica a cada minuto
             }
-        }, 60000); // Inicia após 1 minuto
+        }, DELAY_ONE_MINUTE); // Inicia após 1 minuto
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Salvar o estado dos EditText em um Bundle
+        Bundle editTextState = new Bundle();
+        for (int i = 0; i < linearLayout.getChildCount(); i++) {
+            View view = linearLayout.getChildAt(i);
+            if (view instanceof EditText) {
+                String editTextValue = ((EditText) view).getText().toString();
+                editTextState.putString("editText_" + i, editTextValue);
+            }
+        }
+        onSaveInstanceState(editTextState);
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
 
-    private final TextWatcher textWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            // Verificar se todos os campos estão preenchidos
-            boolean camposPreenchidos = !matricula.getText().toString().isEmpty() &&
-                    !nome.getText().toString().isEmpty() &&
-                    !lotacao.getText().toString().isEmpty() &&
-                    !funcao.getText().toString().isEmpty();
-
-            // Habilitar ou desabilitar o botão com base no estado dos campos
-            btn.setEnabled(camposPreenchidos);
+        // Restaurar o estado dos EditText
+        for (int i = 0; i < linearLayout.getChildCount(); i++) {
+            View view = linearLayout.getChildAt(i);
+            if (view instanceof EditText) {
+                String key = "editText_" + i;
+                if (savedInstanceState.containsKey(key)) {
+                    String editTextValue = savedInstanceState.getString(key);
+                    ((EditText) view).setText(editTextValue);
+                }
+            }
         }
-    };
+    }
 }
