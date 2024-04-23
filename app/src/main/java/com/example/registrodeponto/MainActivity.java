@@ -27,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView tv_horas;
     private EditText matricula, nome, lotacao, funcao;
     private Button btn;
-    private static Registro historicoRegistro;
+    private static Registro historyRecords;
     private LinearLayout linearLayout;
-    private LocalTime horaAtual;
-    private String horaFormatada;
-    private int camposDisponiveis;
+    private LocalTime currentHour;
+    private String formattedHour;
+    private int availableFields;
 
     private final TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(historicoRegistro == null){
-                    historicoRegistro = new Registro(nome.getText().toString(),
+                if(historyRecords == null){
+                    historyRecords = new Registro(nome.getText().toString(),
                             matricula.getText().toString(),
                             lotacao.getText().toString(),
                             funcao.getText().toString());
@@ -83,18 +83,18 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-                RegistroUtils.registrarPonto(MainActivity.this,
+                RegistroUtils.recordWorkHours(MainActivity.this,
                         linearLayout,
-                        historicoRegistro,
+                        historyRecords,
                         LocalTime.now().getHour(),
-                        camposDisponiveis);
+                        availableFields);
             }
         });
 
         // Inicializa a hora atual e os campos disponíveis no
-        horaAtual = LocalTime.now();
-        horaFormatada = String.format(Locale.getDefault(), "%02d:%02d", horaAtual.getHour(), horaAtual.getMinute());
-        camposDisponiveis = RegistroUtils.updateAvailableFields(horaAtual.getHour());
+        currentHour = LocalTime.now();
+        formattedHour = String.format(Locale.getDefault(), "%02d:%02d", currentHour.getHour(), currentHour.getMinute());
+        availableFields = RegistroUtils.updateAvailableFields(currentHour.getHour());
 
         // Atualiza o texto da hora na TextView
         tv_horas = findViewById(R.id.horas);
@@ -105,9 +105,9 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                horaAtual = LocalTime.now();
-                if (horaAtual.getHour() > 23 || horaAtual.getHour() < 9) {
-                    historicoRegistro.clearRecords();
+                currentHour = LocalTime.now();
+                if (currentHour.getHour() > 23 || currentHour.getHour() < 9) {
+                    historyRecords.clearRecords();
                     linearLayout.removeAllViews();
                 }
                 handler.postDelayed(this, DELAY_ONE_MINUTE); // Verifica a cada minuto
