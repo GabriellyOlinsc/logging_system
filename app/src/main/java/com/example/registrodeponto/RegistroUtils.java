@@ -10,35 +10,27 @@ import android.widget.Toast;
 public class RegistroUtils {
 
     @SuppressLint("ResourceAsColor")
-    public static void registrarPonto(Context context, LinearLayout linearLayout, Registro historicoRegistro, String horaFormatada, int horaAtual, int camposDisponiveis) {
-        if (camposDisponiveis > 0) {
-            int horaInicial = 9; // Começando às 9 horas
-            int pontosRegistrados = historicoRegistro.getSize();
-            int qtdeRegistros = calcularQuantidadeRegistros(pontosRegistrados,horaAtual);  //contagem dos pontos que já foram regitrados  5
+    public static void registrarPonto(Context context, LinearLayout linearLayout, Registro recordHistory, int currentHour, int availableFields) {
+        if (availableFields > 0) {
+            int initialHour = 9; // Começando às 9 horas
+            int recordedWorkedHours = recordHistory.getSize();
+            int recordsAmount  = calculateRecordAmount(recordedWorkedHours,currentHour);  //contagem dos pontos que já foram regitrados  5
 
-            if(pontosRegistrados==4){
+            if(recordedWorkedHours==4){
                 Log.i("HORA", "4 PONTOS");
             }
-            if (pontosRegistrados < 8) {
-                for (int i = 0; i < qtdeRegistros; i++) {
-                    historicoRegistro.adicionarRegistro(horaAtual + i);
-                    EditText editText = new EditText(context);
-                    editText.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    ));
-                    if (horaInicial + pontosRegistrados + i - 1 == 12) {
+            if (recordedWorkedHours < 8) {
+                for (int i = 0; i < recordsAmount ; i++) {
+                    recordHistory.addWorkedHourRecord(currentHour + i);
+
+                    if (initialHour + recordedWorkedHours + i - 1 == 12) {
                         continue;
                     }
                     if (i > 8) {
                         break;
                     }
-                    String info = (horaInicial + pontosRegistrados + i - 1) + ":00h - " +(horaInicial + pontosRegistrados + i) + ":00h" + "    " + " Matricula: " + historicoRegistro.getMatricula() + "  |  " + " Nome: " + historicoRegistro.getNome();
-                    editText.setText(info);
-                    editText.setTextColor(R.color.gray);
-                    editText.setTextSize(15f);
-                    editText.setPadding(2,5,15,2);
-                    linearLayout.addView(editText);
+                    String info = (initialHour + recordedWorkedHours + i - 1) + ":00h - " +(initialHour + recordedWorkedHours + i) + ":00h" + "    " + " Matricula: " + recordHistory.getEnrollment() + "  |  " + " Nome: " + recordHistory.getName();
+                    addEditText(context,linearLayout,info);
 
                     Toast.makeText(context, "Campos Inseridos com sucesso.", Toast.LENGTH_SHORT).show();
                 }
@@ -49,33 +41,48 @@ public class RegistroUtils {
         }
     }
 
-    public static int atualizarCamposDisponiveis(int hora) { // Alterado o parâmetro para MainActivity
-        int camposDisponiveis;
-        if (hora >= 8 && hora <= 24) {
-            if (hora < 12) {
-                camposDisponiveis = hora - 8;
-            } else if (hora >= 13 && hora < 24) {
-                camposDisponiveis = hora - 9;
-            } else {
-                camposDisponiveis = 8;
-            }
-        } else {
-            camposDisponiveis = 0;
-        }
-        return camposDisponiveis; // Atribuindo o valor diretamente à activity
+    @SuppressLint("ResourceAsColor")
+    private static void addEditText(Context context, LinearLayout linearLayout, String text){
+        EditText editText = new EditText(context);
+        editText.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        editText.setText(text);
+        editText.setTextColor(R.color.gray);
+        editText.setTextSize(15f);
+        editText.setPadding(2,5,15,2);
+        editText.setEnabled(false);
+        linearLayout.addView(editText);
     }
 
-    public static int calcularQuantidadeRegistros(int camposPreenchidos, int horaRegistro) {
-        int qtdeRegistro;
-        if(horaRegistro>17){
-            qtdeRegistro = 9 - camposPreenchidos;
-        }else{
-            int camposMax = horaRegistro - 8;
-            if (horaRegistro > 13) {
-                camposMax--;
+    public static int updateAvailableFields(int hour) { // Changed parameter to MainActivity
+        int availableFields;
+        if (hour >= 8 && hour <= 24) {
+            if (hour < 12) {
+                availableFields = hour - 8;
+            } else if (hour >= 13 && hour < 24) {
+                availableFields = hour - 9;
+            } else {
+                availableFields = 8;
             }
-            qtdeRegistro = camposMax - camposPreenchidos;
+        } else {
+            availableFields = 0;
         }
-        return qtdeRegistro > 0 ? qtdeRegistro : 0;
+        return availableFields; // Atribuindo o valor diretamente à activity
+    }
+
+    public static int calculateRecordAmount(int filledFields, int recordHour) {
+        int recordCount;
+        if (recordHour > 17) {
+            recordCount = 9 - filledFields;
+        } else {
+            int maxFields = recordHour - 8;
+            if (recordHour > 13) {
+                maxFields--;
+            }
+            recordCount = maxFields - filledFields;
+        }
+        return recordCount > 0 ? recordCount : 0;
     }
 }

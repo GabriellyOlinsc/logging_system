@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                 RegistroUtils.registrarPonto(MainActivity.this,
                         linearLayout,
                         historicoRegistro,
-                        horaFormatada,
                         LocalTime.now().getHour(),
                         camposDisponiveis);
             }
@@ -91,11 +90,11 @@ public class MainActivity extends AppCompatActivity {
         // Inicializa a hora atual e os campos disponíveis
         horaAtual = LocalTime.now();
         horaFormatada = String.format(Locale.getDefault(), "%02d:%02d", horaAtual.getHour(), horaAtual.getMinute());
-        camposDisponiveis = RegistroUtils.atualizarCamposDisponiveis(horaAtual.getHour());
+        camposDisponiveis = RegistroUtils.updateAvailableFields(horaAtual.getHour());
 
         // Atualiza o texto da hora na TextView
         tv_horas = findViewById(R.id.horas);
-        HoraUtils.atualizarHora(tv_horas, this);
+        HoraUtils.updateHour(tv_horas, this);
 
         // Configura o Handler para limpar o LinearLayout se for entre meia-noite e 9h
         Handler handler = new Handler();
@@ -104,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 horaAtual = LocalTime.now();
                 if (horaAtual.getHour() > 23 || horaAtual.getHour() < 9) {
-                    historicoRegistro.limparRegistros();
+                    historicoRegistro.clearRecords();
                     linearLayout.removeAllViews();
                 }
                 handler.postDelayed(this, DELAY_ONE_MINUTE); // Verifica a cada minuto

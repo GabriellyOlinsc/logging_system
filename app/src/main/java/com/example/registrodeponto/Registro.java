@@ -3,64 +3,39 @@ package com.example.registrodeponto;
 import java.util.ArrayList;
 
 public class Registro {
-    private String nome;
-    private String matricula;
-    private String lotacao;
-    private String cargo;
-    private ArrayList<Integer> pontos = new ArrayList<>();
+    private String name;
+    private String enrollment;
+    private String department;
+    private String position;
+    private ArrayList<Integer> workedHours = new ArrayList<>();
 
 
     public Registro(String nome, String matricula, String lotacao, String cargo) {
-        this.nome = nome;
-        this.matricula = matricula;
-        this.lotacao = lotacao;
-        this.cargo = cargo;
+        this.name = nome;
+        this.enrollment = matricula;
+        this.department = lotacao;
+        this.position = cargo;
     }
 
-    public ArrayList<Integer> getPontos() {
-        return pontos;
+    public ArrayList<Integer> getWorkedHours() {
+        return workedHours;
     }
-    public void limparRegistros (){
-        pontos.clear();
+    public void clearRecords (){
+        workedHours.clear();
     }
 
-    public void adicionarRegistro(int horario){
-        pontos.add(horario);
+    public void addWorkedHourRecord(int horario){
+        workedHours.add(horario);
     }
 
     public int getSize(){
-        return pontos.size();
+        return workedHours.size();
+    }
+    public String getName() {
+        return name;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getMatricula() {
-        return matricula;
-    }
-
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
-    }
-
-    public String getLotacao() {
-        return lotacao;
-    }
-
-    public void setLotacao(String lotacao) {
-        this.lotacao = lotacao;
-    }
-
-    public String getCargo() {
-        return cargo;
-    }
-
-    public void setCargo(String cargo) {
-        this.cargo = cargo;
+    public String getEnrollment() {
+        return enrollment;
     }
 }
