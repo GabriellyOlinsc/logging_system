@@ -10,7 +10,7 @@ import android.widget.Toast;
 public class RegistroUtils {
 
     @SuppressLint("ResourceAsColor")
-    public static void registrarPonto(Context context, LinearLayout linearLayout, Registro recordHistory, int currentHour, int availableFields) {
+    public static void recordWorkHours(Context context, LinearLayout linearLayout, Registro recordHistory, int currentHour, int availableFields) {
         if (availableFields > 0) {
             int initialHour = 9; // Começando às 9 horas
             int recordedWorkedHours = recordHistory.getSize();
