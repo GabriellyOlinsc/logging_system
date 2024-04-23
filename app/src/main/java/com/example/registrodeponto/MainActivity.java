@@ -11,11 +11,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Locale;
 
 import android.os.Handler;
 import android.widget.TextView;
@@ -24,13 +23,11 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     private static final int DELAY_ONE_MINUTE = 20000; // 1 minuto em milissegundos
 
-    private TextView tv_horas;
-    private EditText matricula, nome, lotacao, funcao;
+    private EditText registration, name, department, function;
     private Button btn;
-    private static Registro historyRecords;
+    private static Register historyRecords;
     private LinearLayout linearLayout;
     private LocalTime currentHour;
-    private String formattedHour;
     private int availableFields;
 
     private final TextWatcher textWatcher = new TextWatcher() {
@@ -40,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {}
         @Override
         public void afterTextChanged(Editable s) {
-            boolean camposPreenchidos = !matricula.getText().toString().isEmpty() &&
-                    !nome.getText().toString().isEmpty() &&
-                    !lotacao.getText().toString().isEmpty() &&
-                    !funcao.getText().toString().isEmpty();
+            boolean camposPreenchidos = !registration.getText().toString().isEmpty() &&
+                    !name.getText().toString().isEmpty() &&
+                    !department.getText().toString().isEmpty() &&
+                    !function.getText().toString().isEmpty();
 
             btn.setEnabled(camposPreenchidos);
         }
@@ -58,47 +55,43 @@ public class MainActivity extends AppCompatActivity {
 
         linearLayout = findViewById(R.id.campos_registros);
         btn = findViewById(R.id.btn_registrar_ponto);
-        matricula = findViewById(R.id.matriculaInput);
-        nome = findViewById(R.id.nomeInput);
-        lotacao = findViewById(R.id.lotacaoInput);
-        funcao = findViewById(R.id.cargoInput);
+        registration = findViewById(R.id.matriculaInput);
+        name = findViewById(R.id.nomeInput);
+        department = findViewById(R.id.lotacaoInput);
+        function = findViewById(R.id.cargoInput);
 
         // Desabilita o botão até que todos os campos estejam preenchidos
         btn.setEnabled(false);
 
-        matricula.addTextChangedListener(textWatcher);
-        nome.addTextChangedListener(textWatcher);
-        lotacao.addTextChangedListener(textWatcher);
-        funcao.addTextChangedListener(textWatcher);
+        registration.addTextChangedListener(textWatcher);
+        name.addTextChangedListener(textWatcher);
+        department.addTextChangedListener(textWatcher);
+        function.addTextChangedListener(textWatcher);
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(historyRecords == null){
-                    historyRecords = new Registro(nome.getText().toString(),
-                            matricula.getText().toString(),
-                            lotacao.getText().toString(),
-                            funcao.getText().toString());
-                    Log.d("TAG","ja foi criado");
-                }
-
-
-                RegistroUtils.recordWorkHours(MainActivity.this,
-                        linearLayout,
-                        historyRecords,
-                        LocalTime.now().getHour(),
-                        availableFields);
+        btn.setOnClickListener(v -> {
+            if(historyRecords == null){
+                historyRecords = new Register(name.getText().toString(),
+                        registration.getText().toString(),
+                        department.getText().toString(),
+                        function.getText().toString());
+                Log.d("TAG","ja foi criado");
             }
+
+
+            RegistroUtils.recordWorkHours(MainActivity.this,
+                    linearLayout,
+                    historyRecords,
+                    LocalTime.now().getHour(),
+                    availableFields);
         });
 
         // Inicializa a hora atual e os campos disponíveis no
         currentHour = LocalTime.now();
-        formattedHour = String.format(Locale.getDefault(), "%02d:%02d", currentHour.getHour(), currentHour.getMinute());
         availableFields = RegistroUtils.updateAvailableFields(currentHour.getHour());
 
         // Atualiza o texto da hora na TextView
-        tv_horas = findViewById(R.id.horas);
-        HoraUtils.updateHour(tv_horas, this);
+        TextView tvHour = findViewById(R.id.horas);
+        HoraUtils.updateHour(tvHour);
 
         // Configura o Handler para limpar o LinearLayout se for entre meia-noite e 9h
         Handler handler = new Handler();
@@ -131,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
         // Restaurar o estado dos EditText

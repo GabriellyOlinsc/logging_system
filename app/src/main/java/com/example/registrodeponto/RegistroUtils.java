@@ -10,7 +10,7 @@ import android.widget.Toast;
 public class RegistroUtils {
 
     @SuppressLint("ResourceAsColor")
-    public static void recordWorkHours(Context context, LinearLayout linearLayout, Registro recordHistory, int currentHour, int availableFields) {
+    public static void recordWorkHours(Context context, LinearLayout linearLayout, Register recordHistory, int currentHour, int availableFields) {
         if (availableFields > 0) {
             int initialHour = 9; // Começando às 9 horas
             int recordedWorkedHours = recordHistory.getSize();
@@ -83,6 +83,6 @@ public class RegistroUtils {
             }
             recordCount = maxFields - filledFields;
         }
-        return recordCount > 0 ? recordCount : 0;
+        return Math.max(recordCount, 0);
     }
 }

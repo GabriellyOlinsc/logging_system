@@ -1,16 +1,20 @@
 package com.example.registrodeponto;
 
+import android.os.Build;
 import android.os.Handler;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
 
 import java.time.LocalTime;
 
 public class HoraUtils {
     private static Handler handler;
 
-    public static void updateHour(TextView textView, MainActivity activity) {
+    public static void updateHour(TextView textView) {
         handler = new Handler();
         handler.postDelayed(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
                 LocalTime currentHour = LocalTime.now();
