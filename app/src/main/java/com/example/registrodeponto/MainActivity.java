@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Inicializa a hora atual e os campos disponíveis
+        // Inicializa a hora atual e os campos disponíveis no
         horaAtual = LocalTime.now();
         horaFormatada = String.format(Locale.getDefault(), "%02d:%02d", horaAtual.getHour(), horaAtual.getMinute());
         camposDisponiveis = RegistroUtils.updateAvailableFields(horaAtual.getHour());
@@ -143,3 +143,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
